@@ -1,0 +1,4 @@
+apache-airflow==2.4.3
+psycopg2-binary==2.8.6
+mysql-connector-python==8.0.27  # MySQL bağlantısı için
+pandas==2.2.3  # Veri işleme için
