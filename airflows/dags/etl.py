@@ -9,7 +9,7 @@ import pandas as pd
 dag = DAG(
     "etl_sales_pipeline",
     description="ETL pipeline for sales data from PostgreSQL and CSV",
-    schedule_interval="@daily",  # Executes daily
+    schedule="@daily",  # Executes daily
     start_date=datetime(2025, 5, 5),
     catchup=False,
 )
@@ -26,17 +26,17 @@ def extract_postgresql_sales():
     # Run query to fetch the sales data
     df = hook.get_pandas_df(query)
     df.to_csv(
-        "/tmp/online_sales_data.csv", index=False
+        "online_sales_data.csv", index=False
     )  # Store the result to CSV for later use
-    return "/tmp/online_sales_data.csv"
+    return "online_sales_data.csv"
 
 
 # Extract data from CSV
 def extract_csv_sales():
     # Read the CSV file containing in-store sales
-    df = pd.read_csv("/path/to/in_store_sales.csv")
-    df.to_csv("/tmp/in_store_sales_data.csv", index=False)
-    return "/tmp/in_store_sales_data.csv"
+    df = pd.read_csv("in_store_sales.csv")
+    df.to_csv("in_store_sales_data.csv", index=False)
+    return "in_store_sales_data.csv"
 
 
 # Extract tasks
@@ -52,8 +52,8 @@ extract_csv = PythonOperator(
 # Transform data
 def transform_sales_data():
     # Load data from both files
-    online_df = pd.read_csv("/tmp/online_sales_data.csv")
-    in_store_df = pd.read_csv("/tmp/in_store_sales_data.csv")
+    online_df = pd.read_csv("online_sales_data.csv")
+    in_store_df = pd.read_csv("in_store_sales_data.csv")
 
     # Combine both datasets
     combined_df = pd.concat(
@@ -92,12 +92,12 @@ def load_data_to_mysql():
     mysql_hook = MySqlHook(mysql_conn_id="mysql_conn")
 
     # Load the transformed data (from CSV)
-    df = pd.read_csv("/tmp/aggregated_sales_data.csv")
+    df = pd.read_csv("aggregated_sales_data.csv")
 
     # Prepare the insert query
     for _, row in df.iterrows():
         query = """
-        INSERT INTO product_sales_aggregated (product_id, total_quantity, total_sale_amount)
+        INSERT INTO sales_aggregated (product_id, total_quantity, total_sale_amount)
         VALUES (%s, %s, %s)
         ON DUPLICATE KEY UPDATE total_quantity = VALUES(total_quantity), total_sale_amount = VALUES(total_sale_amount);
         """
