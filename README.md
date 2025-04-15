@@ -1,152 +1,90 @@
-# ETL Sales Pipeline with Apache Airflow
+# 🧩 ETL Sales Pipeline with Apache Airflow
 
-## Overview
+## 🚀 Overview
 
-This project implements an **ETL pipeline using Apache Airflow** to automate the extraction, transformation, and loading of sales data. It:
+This project builds a **scalable and maintainable ETL (Extract, Transform, Load) pipeline** using:
 
-- Extracts **e-commerce sales data from a PostgreSQL** database  
-- Extracts **in-store sales data from a CSV** file  
-- Aggregates **total sales per product**  
-- Loads the transformed data into a **MySQL data warehouse** for analysis  
+- **Apache Airflow** for orchestration  
+- **Docker** for containerization and environment consistency
+- **PostgreSQL** as the online sales data source  
+- **MySQL** as the target data warehouse  
 
-The pipeline uses **Airflow for orchestration** and **Docker for containerization**, ensuring scalability, maintainability, and platform compatibility.
 
----
-
-## Project Structure
-
-- **`dags/` Folder**: Contains Airflow DAG files, including the main ETL pipeline (`etl.py`) which manages all tasks.
-- **`logs/` Folder**: Stores logs for monitoring and debugging DAG runs.
-- **`docker-compose.yml`**: Defines services for PostgreSQL, MySQL, and Apache Airflow components.
-- **`Dockerfile`**: Specifies the environment for Apache Airflow, including dependencies.
-- **`requirements.txt`**: Lists Python dependencies for the Airflow pipeline.
-- **`airflow.cfg`**: Contains Airflow configuration settings like executor type and database connections.
+The pipeline automates the end-to-end data flow—**extracting sales data**, **transforming and aggregating it by product**, and **loading it into a data warehouse** for analysis.
 
 ---
 
-## Docker and Airflow Integration
+## 📁 Project Structure
 
-This project uses Docker for containerization, providing **isolated and reproducible environments**.  
-Docker Compose manages containers for:
+- `dags/`: Contains Airflow DAGs including the main ETL workflow (`etl.py`)
+- `logs/`: Stores DAG run logs for monitoring and debugging
+- `docker-compose.yml`: Defines Docker services (Airflow, PostgreSQL, MySQL)
+- `Dockerfile`: Custom Airflow image setup with dependencies
+- `requirements.txt`: Lists Python dependencies for the Airflow pipeline
+- `airflow.cfg`: Airflow configuration (executor, connections, etc.)
 
-- **PostgreSQL** (sales data)  
+---
+
+## Docker & Airflow Integration
+
+Docker ensures an **isolated, reproducible, and platform-independent environment**.  
+Docker Compose runs containers for:
+
+- **PostgreSQL** (online sales data)  
 - **MySQL** (data warehouse)  
-- **Apache Airflow** (ETL orchestration)  
+- **Apache Airflow** (ETL scheduler and orchestrator)  
 
-This setup eliminates platform-specific issues, ensuring a **consistent and scalable environment** across all platforms that support Docker.
+This architecture supports seamless deployment across any system with Docker installed.
 
 ---
 
-## DAG Design: `etl_sales_pipeline`
+## ⏳ DAG Design: `etl_sales_pipeline`
 
-This DAG is designed to perform a **daily ETL (Extract, Transform, Load)** process for sales data.
+This Airflow DAG runs **daily** and follows a classic **ETL workflow**:
 
-### Tasks and Rationale
+### 🔹 Task Breakdown
 
-#### 1. Extract PostgreSQL Sales Data (`extract_postgresql`)
+#### 1. `extract_postgresql` – Extract Online Sales
 
 - **Operator**: `PythonOperator`  
-- **Description**: Extracts sales data from the `online_sales` table in a PostgreSQL database for the previous day. Saves it as `online_sales_data.csv`.  
-- **Tools**: `PostgresHook`, `get_pandas_df`  
-- **Why?**: PythonOperator allows custom SQL logic, and PostgresHook is ideal for PostgreSQL connections.
+- **Description**: Fetches data from the `online_sales` table (PostgreSQL) for the previous day and saves it as `online_sales_data.csv`.  
+- **Tools**: `PostgresHook`, `get_pandas_df()`  
 
----
-
-#### 2. Extract CSV Sales Data (`extract_csv`)
+#### 2. `extract_csv` – Extract In-Store Sales
 
 - **Operator**: `PythonOperator`  
-- **Description**: Reads from `in_store_sales.csv` and saves it as `in_store_sales_data.csv`.  
-- **Why?**: PythonOperator offers flexibility for file reading/writing using Pandas.
+- **Description**: Reads `in_store_sales.csv` and writes it as `in_store_sales_data.csv` for transformation.
 
----
-
-#### 3. Transform Sales Data (`transform_data`)
+#### 3. `transform_data` – Transform Sales Data
 
 - **Operator**: `PythonOperator`  
-- **Description**: Combines online and in-store sales data, removes nulls, aggregates by `product_id`, and saves as `aggregated_sales_data.csv`.  
-- **Why?**: Custom transformations are easier with Pandas and Python logic.
+- **Description**: Combines online and in-store data, removes nulls, aggregates sales by `product_id`, and outputs `aggregated_sales_data.csv`.
 
----
-
-#### 4. Load Data into MySQL (`load_to_mysql`)
+#### 4. `load_to_mysql` – Load Aggregated Data
 
 - **Operator**: `PythonOperator`  
-- **Description**: Loads `aggregated_sales_data.csv` into `sales_aggregated` table in MySQL. Uses `ON DUPLICATE KEY UPDATE` to update existing records.  
-- **Tools**: `MySqlHook`  
-- **Why?**: Allows dynamic and custom SQL inserts.
+- **Description**: Loads `aggregated_sales_data.csv` into the `sales_aggregated` table in MySQL.  
+- **Tools**: `MySqlHook`, with `ON DUPLICATE KEY UPDATE` to handle updates gracefully.
 
 ---
 
-### Operator Choice Rationale
+## 💡 Key Benefits
 
-- **PythonOperator** is used for all tasks:
-  - It provides flexibility for:
-    - Custom SQL querying
-    - File manipulation
-    - Data transformation
-  - Perfect fit for integrating Pandas and Airflow hooks
-
----
-
-## Overall Design Rationale
-
-- The pipeline follows a **clear 4-stage ETL structure**: extract → transform → load  
-- **Dependencies** between tasks ensure correct execution order  
-- Python is used for all tasks to allow custom logic and handle multiple data sources  
-- Scheduled to **run daily**  
-- `catchup=False` ensures only future runs are processed (no backfilling)
+- **Containerized environment** ensures consistent behavior across systems  
+- **Airflow orchestration** provides robust scheduling, monitoring, and error handling  
+- **Extensible design** allows easy integration of:
+  - New data sources  
+  - Advanced transformation logic  
+  - Data quality checks and alerts
 
 ---
 
-## Challenges and Solutions
+## 📸 Screenshots
 
-### 1. Platform and Software Compatibility Issues
-
-- **Challenge**: Apache Airflow setup was difficult on WSL due to dependency mismatches  
-- **Solution**: Docker containerization solved platform issues by standardizing the environment
-
----
-
-### 2. Efficient Data Extraction and Transformation
-
-- **Challenge**: Handling large datasets was slow and resource-intensive  
-- **Solution**:  
-  - Optimized SQL queries  
-  - Used Airflow’s parallel processing capabilities
-
----
-
-### 3. Debugging DAG Execution Failures
-
-- **Challenge**: Debugging task failures with dependencies was complex  
-- **Solution**: Airflow’s built-in logging made it easy to identify and resolve issues
-
----
-
-## Conclusion
-
-This project builds a **scalable and maintainable ETL pipeline** using:
-
-- Apache Airflow  
-- PostgreSQL  
-- MySQL  
-- Docker  
-
-### Key Benefits:
-
-- **Containerization** ensures consistent deployment  
-- **Airflow orchestration** simplifies monitoring and error-handling  
-- **Flexible and extensible design** allows for easy future enhancements, including:
-  - Additional data sources  
-  - Advanced data transformations  
-  - Data quality validation
-
----
-
-## Screenshots
-![image](https://github.com/user-attachments/assets/7d86f37e-421d-43fd-86e8-f1e0c49086e4)
-![image](https://github.com/user-attachments/assets/af91a6e0-caa0-4448-ba77-780ae02ac913)
-![image](https://github.com/user-attachments/assets/68ac1d91-bef9-4b7a-ae7a-377e8961288c)
-![image](https://github.com/user-attachments/assets/276c1a75-a06c-4f0a-93b5-d4ff68e408de)
+![image](https://github.com/user-attachments/assets/7d86f37e-421d-43fd-86e8-f1e0c49086e4)  
+![image](https://github.com/user-attachments/assets/af91a6e0-caa0-4448-ba77-780ae02ac913)  
+![image](https://github.com/user-attachments/assets/68ac1d91-bef9-4b7a-ae7a-377e8961288c)  
+![image](https://github.com/user-attachments/assets/276c1a75-a06c-4f0a-93b5-d4ff68e408de)  
 ![image](https://github.com/user-attachments/assets/0cb47581-d9e3-47f9-85fb-2955be177359)
 
+---
