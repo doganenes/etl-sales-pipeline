@@ -1,4 +1,4 @@
-# 🧩 ETL Sales Pipeline with Apache Airflow
+# ETL Sales Pipeline with Apache Airflow
 
 ## 🚀 Overview
 
