@@ -3,7 +3,7 @@ import psycopg2
 DB_NAME = "sales"
 DB_USER = "airflow"
 DB_PASSWORD = "airflow"
-DB_HOST = "localhost"  # Docker içindeki PostgreSQL container adı olabilir
+DB_HOST = "localhost"  
 DB_PORT = "5432"
 
 try:

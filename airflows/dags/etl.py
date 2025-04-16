@@ -23,23 +23,20 @@ def extract_postgresql_sales():
         FROM online_sales
         WHERE sale_date >= current_date - interval '1 day';
     """
-    # Run query to fetch the sales data
     df = hook.get_pandas_df(query)
     df.to_csv(
         "online_sales_data.csv", index=False
-    )  # Store the result to CSV for later use
+    )  
     return "online_sales_data.csv"
 
 
 # Extract data from CSV
 def extract_csv_sales():
-    # Read the CSV file containing in-store sales
     df = pd.read_csv("in_store_sales.csv")
     df.to_csv("in_store_sales_data.csv", index=False)
     return "in_store_sales_data.csv"
 
 
-# Extract tasks
 extract_postgresql = PythonOperator(
     task_id="extract_postgresql", python_callable=extract_postgresql_sales, dag=dag
 )
@@ -49,13 +46,10 @@ extract_csv = PythonOperator(
 )
 
 
-# Transform data
 def transform_sales_data():
-    # Load data from both files
     online_df = pd.read_csv("online_sales_data.csv")
     in_store_df = pd.read_csv("in_store_sales_data.csv")
 
-    # Combine both datasets
     combined_df = pd.concat(
         [
             online_df[["product_id", "quantity", "sale_amount"]],
@@ -63,10 +57,8 @@ def transform_sales_data():
         ]
     )
 
-    # Cleanse the data (remove nulls)
     combined_df = combined_df.dropna()
 
-    # Aggregate data by product_id
     aggregated_df = (
         combined_df.groupby("product_id")
         .agg(
@@ -75,26 +67,20 @@ def transform_sales_data():
         .reset_index()
     )
 
-    # Store transformed data to CSV
     aggregated_df.to_csv("/tmp/aggregated_sales_data.csv", index=False)
     return "/tmp/aggregated_sales_data.csv"
 
 
-# Transformation task
 transform_data = PythonOperator(
     task_id="transform_data", python_callable=transform_sales_data, dag=dag
 )
 
 
-# Load data into MySQL
 def load_data_to_mysql():
-    # Connect to MySQL
     mysql_hook = MySqlHook(mysql_conn_id="mysql_conn")
 
-    # Load the transformed data (from CSV)
     df = pd.read_csv("aggregated_sales_data.csv")
 
-    # Prepare the insert query
     for _, row in df.iterrows():
         query = """
         INSERT INTO sales_aggregated (product_id, total_quantity, total_sale_amount)
@@ -111,10 +97,8 @@ def load_data_to_mysql():
         )
 
 
-# Loading task
 load_to_mysql = PythonOperator(
     task_id="load_to_mysql", python_callable=load_data_to_mysql, dag=dag
 )
 
-# Set task dependencies
 extract_postgresql >> extract_csv >> transform_data >> load_to_mysql
