@@ -32,11 +32,11 @@ services:
     image: apache/airflow:2.10.5
     depends_on:
       - postgres
-      - mysql  # Mysql ve Postgres bağımlılığı
+      - mysql
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow  # PostgreSQL bağlantısı
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_ALT=mysql+mysqlconnector://airflow:airflow@mysql:3306/airflow  # MySQL bağlantısı
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_ALT=mysql+mysqlconnector://airflow:airflow@mysql:3306/airflow
       - AIRFLOW__WEBSERVER__AUTHENTICATE=False
     volumes:
       - ./dags:/opt/airflow/dags
@@ -50,11 +50,11 @@ services:
     image: apache/airflow:2.10.5
     depends_on:
       - postgres
-      - mysql  # Mysql ve Postgres bağımlılığı
+      - mysql  
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow  # PostgreSQL bağlantısı
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_ALT=mysql+mysqlconnector://airflow:airflow@mysql:3306/airflow  # MySQL bağlantısı
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN_ALT=mysql+mysqlconnector://airflow:airflow@mysql:3306/airflow
       - AIRFLOW__WEBSERVER__AUTHENTICATE=False
     volumes:
       - ./dags:/opt/airflow/dags
