@@ -1,6 +1,6 @@
-# ETL Sales Pipeline with Apache Airflow
-
 ## 🚀 Overview
+
+<img width="805" height="193" alt="Screenshot_6" src="https://github.com/user-attachments/assets/9ac8bee3-3dbd-434a-a820-3668dc8b17fd" />
 
 This project builds a **scalable and maintainable ETL (Extract, Transform, Load) pipeline** using:
 
@@ -81,10 +81,14 @@ This Airflow DAG runs **daily** and follows a classic **ETL workflow**:
 
 ## 📸 Screenshots
 
-![image](https://github.com/user-attachments/assets/7d86f37e-421d-43fd-86e8-f1e0c49086e4)  
-![image](https://github.com/user-attachments/assets/af91a6e0-caa0-4448-ba77-780ae02ac913)  
-![image](https://github.com/user-attachments/assets/68ac1d91-bef9-4b7a-ae7a-377e8961288c)  
-![image](https://github.com/user-attachments/assets/276c1a75-a06c-4f0a-93b5-d4ff68e408de)  
-![image](https://github.com/user-attachments/assets/0cb47581-d9e3-47f9-85fb-2955be177359)
+<img width="1173" height="397" alt="Screenshot_7" src="https://github.com/user-attachments/assets/a8e08ccf-6763-494a-8113-d3ba2c61af57" />
+<img width="782" height="433" alt="Screenshot_2" src="https://github.com/user-attachments/assets/3dec022c-c30c-4567-9611-b88d89ddb36b" />
+<img width="781" height="230" alt="Screenshot_1" src="https://github.com/user-attachments/assets/6f5eaa80-f16f-46fc-86a7-1b61d375dc16" />
+<img width="767" height="378" alt="Screenshot_3" src="https://github.com/user-attachments/assets/23bb0174-6b13-4183-aa21-d859bce690e9" />
+<img width="1164" height="591" alt="Screenshot_8" src="https://github.com/user-attachments/assets/23670041-009f-4083-8975-d89613f34707" />
+
+
+
+
 
 ---
